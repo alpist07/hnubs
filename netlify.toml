@@ -1,0 +1,64 @@
+# 여기는 API 서버다. 정식 사이트는 GitHub Pages 가 맡는다.
+# 레포 루트를 올리면 소스가 그대로 열리고(실제로 api/_shared.mjs 까지 200 이었다)
+# 배포마다 불필요한 용량이 올라가 빌드 분을 깎는다. 안내 페이지 한 장만 올린다.
+[build]
+  command = ""
+  publish = "netlify-public"
+
+[functions]
+  directory = "api"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/maintenance"
+  to = "/.netlify/functions/maintenance"
+  status = 200
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[[redirects]]
+  from = "/api/chat/jobs/:id"
+  to = "/.netlify/functions/chat-job?id=:id"
+  status = 200
+
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200
+
+[[redirects]]
+  from = "/api/analysis/jobs/:id/retry/:index"
+  to = "/.netlify/functions/analysis-retry?id=:id&index=:index"
+  status = 200
+
+[[redirects]]
+  from = "/api/analysis/jobs/:id"
+  to = "/.netlify/functions/analysis-job?id=:id"
+  status = 200
+
+[[redirects]]
+  from = "/api/analysis/jobs"
+  to = "/.netlify/functions/analysis-start"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com; worker-src 'self' blob:; connect-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

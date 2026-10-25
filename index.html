@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F5FC">
+  <meta name="description" content="HNUBS 방송국 내부 일정 및 인원 관리 시스템">
+  <title>HNUBS 관리 시스템</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="./styles.css?v=20261026-renewal7">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문 바로가기</a>
+  <span class="hn-blob hn-blob-a" aria-hidden="true"></span>
+  <span class="hn-blob hn-blob-b" aria-hidden="true"></span>
+  <span class="hn-blob hn-blob-c" aria-hidden="true"></span>
+
+  <header class="hn-header">
+    <div class="hn-header-inner">
+      <button class="hn-brand" type="button" data-route="home" aria-label="HNUBS 홈으로 이동">
+        <span class="hn-brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <strong>HNUBS</strong><span>workspace</span>
+      </button>
+
+      <nav class="hn-nav" aria-label="주 메뉴">
+        <button type="button" data-route="home">홈</button>
+        <button type="button" data-route="weekly">주간 일정표</button>
+        <button type="button" data-route="script">AI 대본 분석</button>
+        <button type="button" data-route="shorts">쇼츠</button>
+        <button type="button" data-route="shoots">일정</button>
+        <button type="button" data-route="personal" class="hn-collapsible">개인 일정</button>
+        <button type="button" data-route="notices" class="hn-collapsible">공지사항</button>
+        <button type="button" data-route="settings" class="hn-collapsible">설정</button>
+      </nav>
+
+      <div class="hn-header-actions">
+        <div class="hn-search-wrap">
+          <label class="hn-search" aria-label="전체 검색">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+            <input id="global-search" type="search" placeholder="일정, 구성원, 공지 검색" autocomplete="off"
+              role="combobox" aria-expanded="false" aria-controls="search-results">
+            <kbd>⌘K</kbd>
+          </label>
+          <div id="search-results" class="hn-search-panel" role="listbox" aria-label="검색 결과" hidden></div>
+        </div>
+        <button class="hn-icon-button" id="notification-button" type="button" aria-label="알림 열기" aria-expanded="false">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+          <i class="hn-dot" aria-hidden="true"></i>
+        </button>
+        <button class="hn-profile" id="profile-button" type="button" aria-label="보조 메뉴와 시범 운영 정보 열기" aria-expanded="false">
+          <span class="hn-profile-avatar" aria-hidden="true">β</span>
+          <span class="hn-who"><strong>시범 운영</strong><span>로그인 없음</span></span>
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64708F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div id="app" class="hn-main" aria-live="polite"></div>
+  </main>
+
+  <nav class="mobile-nav" aria-label="모바일 주요 메뉴">
+    <button type="button" data-route="home"><span data-icon="home"></span><span>홈</span></button>
+    <button type="button" data-route="weekly"><span data-icon="calendar"></span><span>일정</span></button>
+    <button type="button" data-route="shoots"><span data-icon="camera"></span><span>일정</span></button>
+    <button type="button" data-route="personal"><span data-icon="clock"></span><span>개인 일정</span></button>
+    <button type="button" id="mobile-more"><span data-icon="menu"></span><span>더보기</span></button>
+  </nav>
+
+  <div class="popover notification-popover" id="notification-popover" hidden>
+    <div class="popover-head"><strong>알림</strong><button type="button" data-action="close-popover" aria-label="알림 닫기"><span data-icon="x"></span></button></div>
+    <div id="notification-list"></div>
+    <button class="text-link popover-footer" type="button" data-route="shoots">모든 일정 보기 <span data-icon="arrow-right"></span></button>
+  </div>
+
+  <div class="popover profile-popover" id="profile-popover" hidden>
+    <button type="button" data-route="personal"><span data-icon="user"></span>내 일정</button>
+    <button type="button" data-route="people"><span data-icon="users"></span>인원 관리</button>
+    <button type="button" data-route="settings"><span data-icon="settings"></span>설정</button>
+    <hr>
+    <div class="pilot-note"><strong>시범 운영 중</strong><small>로그인 기능은 2027년 정식 운영 업데이트에 추가할 예정입니다.</small></div>
+  </div>
+
+  <div class="mobile-sheet-backdrop" id="mobile-menu-backdrop" hidden></div>
+  <aside class="mobile-menu-sheet" id="mobile-menu" aria-label="전체 메뉴" aria-hidden="true">
+    <div class="sheet-grabber" aria-hidden="true"></div>
+    <div class="mobile-profile"><span class="avatar avatar-blue">β</span><span><strong>HNUBS workspace</strong><small>시범 운영 · 로그인 없음</small></span><button class="icon-button" type="button" data-action="close-mobile-menu" aria-label="메뉴 닫기"><span data-icon="x"></span></button></div>
+    <div class="mobile-menu-grid">
+      <button type="button" data-route="script"><span data-icon="sparkles"></span>AI 대본 분석</button>
+      <button type="button" data-route="people"><span data-icon="users"></span>인원 관리</button>
+      <button type="button" data-route="settings"><span data-icon="settings"></span>설정</button>
+      <button type="button" data-route="settings" data-settings-target="service"><span data-icon="help-circle"></span>도움말</button>
+    </div>
+  </aside>
+
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="상세 정보">
+    <div id="drawer-content"></div>
+  </aside>
+
+  <aside class="air" aria-label="Air(에어) AI 도우미">
+    <div id="air-bubble" class="air-bubble" role="status"></div>
+    <section id="air-chat" class="air-chat" aria-label="Air 대화창" hidden>
+      <header class="air-head">
+        <span class="air-mark" aria-hidden="true">✦</span>
+        <span class="air-who"><b>Air<small>에어</small></b><small id="air-status">AI 서버 확인 중</small></span>
+        <button id="air-close" class="air-close" type="button" aria-label="닫기">×</button>
+      </header>
+      <div id="air-messages" class="air-messages"></div>
+      <form id="air-form" class="air-form">
+        <textarea id="air-input" rows="1" placeholder="무엇이든 물어보세요" autocomplete="off"></textarea>
+        <button type="submit" aria-label="전송"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M3.4 20.4l17.45-7.48a1 1 0 0 0 0-1.84L3.4 3.6a1 1 0 0 0-1.39 1.2L4 11l9 1-9 1-1.99 6.2a1 1 0 0 0 1.39 1.2z"/></svg></button>
+      </form>
+    </section>
+    <button id="air-button" class="air-button" type="button" aria-label="Air(에어) 열기" aria-expanded="false">✦</button>
+  </aside>
+
+  <div id="air-confirm" class="air-confirm" hidden>
+    <section class="air-confirm-card" role="dialog" aria-modal="true" aria-labelledby="air-confirm-title">
+      <h2 id="air-confirm-title"><span class="air-confirm-icon" aria-hidden="true">✦</span>일정을 추가할까요?</h2>
+      <pre id="air-confirm-details"></pre>
+      <div class="air-confirm-actions">
+        <button id="air-confirm-cancel" type="button" class="air-confirm-cancel">취소</button>
+        <button id="air-confirm-ok" type="button" class="air-confirm-ok">추가</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script src="./api-config.js?v=1"></script>
+  <script src="./app.js?v=20261026-renewal10"></script>
+</body>
+</html>

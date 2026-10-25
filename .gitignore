@@ -1,0 +1,38 @@
+# 비밀값·의존성·빌드물
+.env
+.netlify
+node_modules/
+__pycache__/
+.wrangler/
+dist/
+test-results/
+work/
+desktop.ini
+
+# 디자인 산출물 (리뉴얼 원본과 거기서 뽑아낸 중복본)
+# 디스크에는 남겨 두고 레포에만 안 올린다. 같은 9개 페이지가 세 벌 있다.
+_source-final-design-board.html
+HNUBS 관리 시스템 리뉴얼-original.html
+_final-design-pages/
+reference/
+*.dc.html
+*.png
+
+# 작업 중 만든 백업
+_before-final-html-20261025/
+_prototype-backup-20261025/
+*.bak
+*.bak[0-9]
+.gitignore.bak
+
+# 도구가 설치한 파일 (개발 환경마다 다시 깔면 된다)
+.claude/skills/
+.claude/agents/
+.github/skills/
+.github/agents/
+.github/hooks/
+.impeccable/
+
+# GitHub Pages 배포용. 이 레포는 Netlify 로 배포해서 쓰지 않는다.
+# (푸시에 workflow 권한이 필요해 레포에서는 뺀다. 파일은 디스크에 남아 있다.)
+.github/workflows/
