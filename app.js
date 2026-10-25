@@ -45,7 +45,7 @@ const firebaseState = { pending: new Set(['members','shoots','projects','availab
 // 공지사항은 Firestore 'notices' 컬렉션에서 온다. 비어 있으면 비어 있는 대로 둔다.
 let notices = [];
 
-const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
+const state = { route: location.hash.slice(1) || 'home', selectedSlot: '월 09:00', mobileDay: 0, aiProjectId: '', aiFile: '', aiText: '', aiChars: 0, aiExtracting: false, aiRunning: false, aiError: '', aiJob: null, aiSceneIndex: 0, aiMappings: {}, aiPrecision: '균형 (추천)', aiWeek: 0, aiStep: 0, makerTab: 'script', shortsState: 'idle', shortsSetup: false, aiHealthText: '', settingsSection: 'logs', selectedShoot: '', shootFilter: 'all', shootCategory: 'all', shootQuery: '', shootsMode: 'calendar', shootMonth: 0, shootDay: '', noticeTag: 'all', peopleDept: '전체', peopleQuery: '', personalMemberId: '', personalMonth: 0, homeMonth: 0, personalDay: '', slots: [], mustIds: [], weekOffset: 0 };
 
 function icon(name) { return `<span data-icon="${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg></span>`; }
 function esc(value = '') { return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char])); }
@@ -667,7 +667,7 @@ function shortsView(){
      .hn-main 의 안쪽 여백을 음수 마진으로 걷어내 화면 끝까지 쓴다. */
   if (st === 'on') {
     return `<section aria-label="쇼츠 메이커"
-      style="margin:-22px calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 64px);overflow:hidden;background:#F4F5FC">
+      style="margin:0 calc(-1 * clamp(16px, 3vw, 32px)) -48px;height:calc(100vh - 190px);min-height:520px;overflow:hidden;background:#F4F5FC">
       <iframe src="${shortsUrl(c)}" title="쇼츠 메이커" style="display:block;width:100%;height:100%;border:0"></iframe>
     </section>`;
   }
@@ -704,6 +704,23 @@ function shortsView(){
     </div>
     <div style="width:100%;display:flex;flex-direction:column;gap:12px">${howto}${setup}</div>
   </section>`;
+}
+
+/* ===== 메이커스페이스 =====
+   대본에서 촬영거리를 뽑는 일(대본 분석)과 영상에서 쇼츠를 뽑는 일(쇼츠)은
+   둘 다 '만드는' 작업이라 한 탭 아래 둔다. */
+const MAKER_TABS = [['script', 'AI 대본 분석'], ['shorts', '쇼츠']];
+
+function makerView(){
+  const tabs = MAKER_TABS.map(([k, label]) => {
+    const on = state.makerTab === k;
+    return `<button data-maker-tab="${k}" aria-selected="${on}" role="tab"
+      style="height:38px;padding:0 16px;border:0;border-radius:11px;background:${on ? '#EEF2FF' : 'transparent'};color:${on ? '#3F55D6' : '#64708F'};font-family:inherit;font-size:14.5px;font-weight:${on ? 700 : 600};cursor:pointer">${label}</button>`;
+  }).join('');
+
+  return `
+  <div role="tablist" aria-label="메이커스페이스" style="display:flex;align-items:center;gap:4px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.9);border:1px solid #FFFFFF;box-shadow:0 8px 24px rgba(60,72,140,0.06)">${tabs}</div>
+  ${state.makerTab === 'shorts' ? shortsView() : scriptView()}`;
 }
 
 function scriptView(){
@@ -1401,19 +1418,21 @@ function peopleSettings(){
   </section>`;
 }
 
-const views={home:homeView,weekly:weeklyView,script:scriptView,shorts:shortsView,shoots:shootsView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
+const views={home:homeView,weekly:weeklyView,maker:makerView,shoots:shootsView,personal:personalView,notices:noticesView,settings:settingsViewLocked};
 
 function render(){
   // 인원 관리는 설정 안으로 옮겼다. 예전 #people 주소도 그쪽으로 보낸다.
   if(state.route==='people'){ state.settingsSection='people'; state.route='settings'; }
   // 시간 분석은 주간 일정표와 같은 계산이라 없앴다. 옛 주소는 그쪽으로 보낸다.
   if(state.route==='analysis') state.route='weekly';
+  // 대본 분석과 쇼츠는 메이커스페이스 안으로 들어갔다. 예전 주소도 그쪽으로 보낸다.
+  if(state.route==='script'||state.route==='shorts'){ state.makerTab=state.route; state.route='maker'; }
   if(!views[state.route]) state.route='home';
   $('#app').innerHTML=views[state.route]();
   $$('[data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));
-  document.body.classList.toggle('hn-shorts', state.route==='shorts');
+  document.body.classList.toggle('hn-shorts', state.route==='maker' && state.makerTab==='shorts');
   renderNotifications();
-  hydrateIcons(); bindView(); document.title=`${{home:'홈',weekly:'주간 일정표',script:'AI 대본 분석',shorts:'쇼츠',shoots:'일정',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
+  hydrateIcons(); bindView(); document.title=`${{home:'홈',weekly:'주간 일정표',maker:'메이커스페이스',shoots:'일정',notices:'공지사항',personal:'개인 일정',people:'인원 관리',settings:'설정'}[state.route]} · HNUBS`;
 }
 
 function renderNotifications(){
@@ -1432,6 +1451,7 @@ setInterval(()=>{ if(state.route==='home'&&!document.hidden) render(); },30000);
 function bindView(){
   $$('[data-shoot-pick]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();state.selectedShoot=b.dataset.shootPick;render();}));
   $('#ai-project')?.addEventListener('change',e=>{state.aiProjectId=e.target.value;state.aiJob=null;state.aiSceneIndex=0;render();});
+  $$('[data-maker-tab]').forEach(b=>b.addEventListener('click',()=>{state.makerTab=b.dataset.makerTab;render();}));
   $$('[data-shorts-reload]').forEach(b=>b.addEventListener('click',shortsProbe));
   $$('[data-shorts-setup]').forEach(b=>b.addEventListener('click',()=>{state.shortsSetup=!state.shortsSetup;render();}));
   $('#shorts-form')?.addEventListener('submit',e=>{
@@ -1441,7 +1461,7 @@ function bindView(){
     localStorage.setItem('hnubs:shorts-key',f.key.value.trim());
     state.shortsSetup=false; shortsProbe();
   });
-  if(state.route==='shorts'&&state.shortsState==='idle') shortsProbe();
+  if(state.route==='maker'&&state.makerTab==='shorts'&&state.shortsState==='idle') shortsProbe();
   $('#admin-form')?.addEventListener('submit',async e=>{
     e.preventDefault();
     const pw=$('#admin-pw'), btn=$('#admin-submit'), msg=$('#admin-msg');
@@ -1495,7 +1515,8 @@ function bindView(){
   $$('[data-preference]').forEach(select=>{const key=`hnubs:${select.dataset.preference}`;const saved=localStorage.getItem(key);if(saved!==null)select.value=saved;select.addEventListener('change',()=>{localStorage.setItem(key,select.value);toast('이 기기에 기본값이 저장되었습니다.');});});
 }
 
-function navigate(route){ if(route==='people'){state.settingsSection='people';route='settings';} if(route==='analysis')route='weekly'; state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
+function navigate(route){ if(route==='people'){state.settingsSection='people';route='settings';} if(route==='analysis')route='weekly';
+  if(route==='script'||route==='shorts'){ state.makerTab=route; route='maker'; } state.route=route; location.hash=route; closeMobileMenu(); closePopovers(); render(); scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 document.addEventListener('click',e=>{
   const routeTarget=e.target.closest('[data-route]');const route=routeTarget?.dataset.route;if(route){if(routeTarget.dataset.settingsTarget)state.settingsSection=routeTarget.dataset.settingsTarget;navigate(route);return;}
   const action=e.target.closest('[data-action]')?.dataset.action;if(action==='new-shoot')openShootDrawer();if(action==='new-personal')openPersonalDrawer();if(action==='new-person')openPersonDrawer();if(action==='new-notice')openNoticeDrawer();if(action==='close-drawer')closeDrawer();if(action==='close-popover')closePopovers();if(action==='close-mobile-menu')closeMobileMenu();
